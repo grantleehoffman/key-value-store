@@ -10,7 +10,7 @@
       "Type": "String"
     },
     "InstanceType": {
-      "Description": "Instance Size",
+      "Description": "Instance size",
       "Type": "String",
       "Default": "t2.nano"
     },
@@ -25,12 +25,12 @@
       "Type": "Number"
     },
     "ArtifactBucket": {
-      "Description": "Bucket where config artifact is retrieved from",
+      "Description": "Bucket where artifact is retrieved from",
       "Default": "craft-demo-key-value-store-us-east-1",
       "Type": "String"
     },
     "ArtifactKey": {
-      "Description": "Bucket object key where config artifact is retrieved from",
+      "Description": "Bucket object key where artifact is retrieved from",
       "Default": "consul",
       "Type": "String"
     }
@@ -132,7 +132,7 @@
         "SecurityGroups": [ {"Ref": "ConsulServerSecurityGroup"}, {"Ref": "ConsulServerAccessGroup"}],
         "KeyName": { "Ref": "KeyName" },
         "UserData": { "Fn::Base64": { "Fn::Join": ["", [
-          "#!/bin/bash -x\n",
+          "#!/bin/bash \n",
           "IP=$(hostname -I)\n",
           "echo \"$IP$HOSTNAME\">> /etc/hosts\n",
           "sudo apt-get update\n",
