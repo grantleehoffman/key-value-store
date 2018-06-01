@@ -1,0 +1,227 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+
+  "Description": "Consul ASG Template",
+
+  "Parameters": {
+    "AmiId": {
+      "Description": "Ubuntu AMI ID",
+      "Default": "ami-a4dc46db",
+      "Type": "String"
+    },
+    "InstanceType": {
+      "Description": "Instance Size",
+      "Type": "String",
+      "Default": "t2.nano"
+    },
+    "KeyName": {
+      "Description": "Name of an existing EC2 key pair to enable SSH access to the instances",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+    },
+    "NumberOfInstances": {
+      "Description": "The Number of instances to create",
+      "Default": "3",
+      "Type": "Number"
+    },
+    "ArtifactBucket": {
+      "Description": "Bucket where config artifact is retrieved from",
+      "Default": "craft-demo-key-value-store-us-east-1",
+      "Type": "String"
+    },
+    "ArtifactKey": {
+      "Description": "Bucket object key where config artifact is retrieved from",
+      "Default": "consul",
+      "Type": "String"
+    }
+  },
+
+  "Resources": {
+    "InstanceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["ec2.amazonaws.com"]
+              },
+              "Action": ["sts:AssumeRole"]
+            }
+          ]
+        },
+        "Path": "/"
+      }
+    },
+    "RolePolicies": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "S3Download",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:Get*"
+              ],
+              "Effect": "Allow",
+              "Resource": {"Fn::Sub": "arn:aws:s3:::${ArtifactBucket}/${ArtifactKey}"}
+            },
+            {
+              "Action": [
+                "ec2:DescribeInstances"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [{"Ref": "InstanceRole"}]
+      }
+    },
+    "InstanceProfile": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Path": "/",
+        "Roles": [{"Ref": "InstanceRole"}]
+      }
+    },
+
+    "ConsulServerGroup": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "UpdatePolicy": {
+        "AutoScalingRollingUpdate": {
+          "PauseTime": "PT10M",
+          "WaitOnResourceSignals": "true"
+        }
+      },
+      "Properties": {
+        "HealthCheckType": "EC2",
+        "LaunchConfigurationName": { "Ref": "ConsulLaunchConfig" },
+        "MinSize": {"Ref": "NumberOfInstances"},
+        "MaxSize": {"Ref": "NumberOfInstances"},
+        "DesiredCapacity": {"Ref": "NumberOfInstances"},
+        "LoadBalancerNames": [{"Fn::ImportValue": "Key-Value-ElbName" } ],
+        "VPCZoneIdentifier": [{"Fn::ImportValue": "Key-Value-PrivateSubnet"}],
+        "Tags":[
+          {
+            "Key": "Name",
+            "Value": "ConsulServer",
+            "PropagateAtLaunch": "true"
+          },
+          {
+            "Key": "consul-key-value",
+            "Value": "member",
+            "PropagateAtLaunch": "true"
+          }
+        ]
+      },
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Timeout": "PT30M"
+        }
+      }
+    },
+
+    "ConsulLaunchConfig": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": { "Ref": "AmiId" },
+        "InstanceType": {"Ref": "InstanceType"},
+        "IamInstanceProfile": {"Ref": "InstanceProfile" },
+        "SecurityGroups": [ {"Ref": "ConsulServerSecurityGroup"}, {"Ref": "ConsulServerAccessGroup"}],
+        "KeyName": { "Ref": "KeyName" },
+        "UserData": { "Fn::Base64": { "Fn::Join": ["", [
+          "#!/bin/bash -x\n",
+          "IP=$(hostname -I)\n",
+          "echo \"$IP$HOSTNAME\">> /etc/hosts\n",
+          "sudo apt-get update\n",
+          "sudo apt-get -y install python-setuptools python-pip\n",
+          "pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+          "pip install awscli\n",
+          "mkdir -p /opt/consul\n",
+          "aws s3api get-object --bucket ", {"Ref": "ArtifactBucket"},
+            " --key ", {"Ref": "ArtifactKey"},  " /tmp/consul",
+            " --region ", {"Ref": "AWS::Region"}, "\n",
+          "cp /tmp/consul /opt/consul/consul\n",
+          "chmod +x /opt/consul/consul\n",
+          "nohup /opt/consul/consul agent -retry-join \"provider=aws tag_key=consul-key-value tag_value=member\"",
+            " -data-dir /opt/consul/data  -server -bootstrap-expect 3",
+            "  >> /var/log/consul.log &\n",
+          "/usr/local/bin/cfn-signal -e $? ",
+            "         --stack ", {"Ref": "AWS::StackName"},
+            "         --resource ConsulServerGroup ",
+            "         --region ", {"Ref": "AWS::Region"}, "\n"
+        ]]}}
+      }
+    },
+    "ConsulServerSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Security group container",
+        "VpcId": {"Fn::ImportValue" :  "Key-Value-VPCID"}
+      }
+    },
+
+    "ConsulServerAccessGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable consul server access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8300,
+            "ToPort": 8300,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8301,
+            "ToPort": 8302,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "udp",
+            "FromPort": 8301,
+            "ToPort": 8302,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8500,
+            "ToPort": 8500,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8600,
+            "ToPort": 8600,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "udp",
+            "FromPort": 8600,
+            "ToPort": 8600,
+            "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "SourceSecurityGroupId": {"Fn::ImportValue" : "Key-Value-ElbSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIp": {"Fn::ImportValue" : "Key-Value-VPCCIDR"}
+          }
+        ],
+        "VpcId": {"Fn::ImportValue" :  "Key-Value-VPCID"}
+      }
+    }
+  }
+
+}
+
+

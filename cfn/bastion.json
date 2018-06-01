@@ -1,0 +1,65 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Bastion Instance",
+  "Parameters": {
+    "AmiId": {
+      "Description": "Ubuntu AMI ID",
+      "Default": "ami-a4dc46db",
+      "Type": "String"
+    },
+    "InstanceType": {
+      "Description": "Instance Size",
+      "Type": "String",
+      "Default": "t2.nano"
+    },
+    "KeyName": {
+      "Description": "Name of an existing EC2 key pair to enable SSH access to the instances",
+      "Type": "AWS::EC2::KeyPair::KeyName",
+      "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+    }
+  },
+  "Resources": {
+    "Instance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {"Ref": "AmiId"},
+        "InstanceType": {"Ref": "InstanceType"},
+        "KeyName": {"Ref": "KeyName"},
+        "NetworkInterfaces": [
+          {
+            "AssociatePublicIpAddress": true,
+            "GroupSet": [ {"Ref": "BastionSecurityGroup"}],
+            "DeviceIndex": "0",
+            "SubnetId": { "Fn::ImportValue": "Key-Value-PublicSubnet"}
+          }
+        ]
+      }
+    },
+    "BastionSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Enable SSH access",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "22",
+            "ToPort": "22",
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "VpcId": {"Fn::ImportValue" :  "Key-Value-VPCID"}
+      }
+    }
+  },
+  "Outputs": {
+    "PublicIP": {
+      "Description": "Public IP of the instance",
+      "Value": {
+        "Fn::GetAtt": [
+          "Instance",
+          "PublicIp"
+        ]
+      }
+    }
+  }
+}
