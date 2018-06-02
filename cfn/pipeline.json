@@ -1,0 +1,298 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Pipeline Template for automated deployment and testing",
+
+  "Parameters": {
+    "CodebuildProjectName": {
+      "Description": "What to name the codebuild project",
+      "Default": "KvTest",
+      "Type": "String"
+    },
+    "PipelineBucket": {
+      "Description": "Location of the bucket codepipeline will use for moving artifacts between actions",
+      "Default": "codepipeline-us-east-1-852943352104",
+      "Type": "String"
+    },
+    "SourceArtifactBucket": {
+      "Description": "The s3 bucket name for the pipeline source artifact",
+      "Default": "creaft-demo-pipeline-source-bucket-us-east-1",
+      "Type": "String"
+    },
+    "SourceArtifactKey": {
+      "Description": "The s3 object key of the pipeline source artifact",
+      "Default": "deployment-artifact.zip",
+      "Type": "String"
+    }
+  },
+
+  "Resources": {
+    "CodeBuildTest": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Name": {"Ref": "CodebuildProjectName"},
+        "Source": {"Type": "CODEPIPELINE"},
+        "Artifacts": {"Type": "CODEPIPELINE"},
+        "ServiceRole": {"Ref": "CodeBuildRole"},
+        "Environment": {
+          "Type": "LINUX_CONTAINER",
+          "ComputeType": "BUILD_GENERAL1_SMALL",
+          "Image": "aws/codebuild/ubuntu-base:14.04"
+        },
+        "TimeoutInMinutes": 20
+      }
+    },
+    "PipelineServiceRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codepipeline.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": {"Fn::Sub": "${CodebuildProjectName}-pipeline-service-role"},
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "s3:GetObject",
+                    "s3:GetObjectVersion",
+                    "s3:GetBucketVersioning"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::codepipeline*"
+                  ],
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "sns:*",
+                    "iam:PassRole"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
+                    "codebuild:BatchGetBuilds",
+                    "codebuild:StartBuild"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CodeBuildRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codebuild.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": {"Fn::Sub": "${CodebuildProjectName}-codebuild-role"},
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Action": [
+                    "logs:*",
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface",
+                    "ec2:DescribeSubnets",
+                    "ec2:DescribeSecurityGroups",
+                    "ec2:DescribeDhcpOptions",
+                    "ec2:DescribeVpcs",
+                    "ec2:CreateNetworkInterfacePermission",
+                    "ssm:GetParameters",
+                    "iam:GetUser"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*"
+                },
+                {
+                  "Action": [
+                    "s3:Get*"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": {"Fn::Sub": "arn:aws:s3:::${PipelineBucket}/*"}
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": "arn:aws:dynamodb:*:*:table/icfs-terraform"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ec2:Create*",
+                    "ec2:Describe*",
+                    "ec2:RunInstances"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "Pipeline": {
+      "Type": "AWS::CodePipeline::Pipeline",
+      "Properties": {
+        "Name": {"Ref": "CodebuildProjectName"},
+        "RoleArn": {"Fn::GetAtt" : ["PipelineServiceRole", "Arn"] },
+        "ArtifactStore": {
+          "Type": "S3",
+          "Location": {"Ref": "PipelineBucket"}
+        },
+        "Stages": [
+          {
+            "Name": "Source",
+            "Actions": [
+              {
+                "Name": "Source",
+                "ActionTypeId": {
+                  "Category": "Source",
+                  "Owner": "AWS",
+                  "Provider": "S3",
+                  "Version": "1"
+                },
+                "RunOrder": 1,
+                "Configuration": {
+                  "PollForSourceChanges": "true",
+                  "S3Bucket": {"Ref": "SourceArtifactBucket"},
+                  "S3ObjectKey": {"Ref": "SourceArtifactKey"}
+                },
+                "OutputArtifacts": [
+                  {
+                    "Name": "MyApp"
+                  }
+                ]
+              }
+            ]
+          },
+
+          {
+            "Name": "Deploy",
+            "Actions": [
+              {
+                "Name": "PersistentInfrastructure",
+                "ActionTypeId": {
+                  "Category": "Deploy",
+                  "Owner": "AWS",
+                  "Provider": "CloudFormation",
+                  "Version": "1"
+                },
+                "RunOrder": 1,
+                "Configuration": {
+                  "ActionMode": "CREATE_UPDATE",
+                  "Capabilities": "CAPABILITY_IAM",
+                  "RoleArn": "arn:aws:iam::313694191233:role/test-cfn-pipelin",
+                  "StackName": "persistent-resources",
+                  "TemplatePath": "MyApp::cfn/persistent-resources.json"
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "MyApp"
+                  }
+                ]
+              },
+              {
+                "Name": "Consul",
+                "ActionTypeId": {
+                  "Category": "Deploy",
+                  "Owner": "AWS",
+                  "Provider": "CloudFormation",
+                  "Version": "1"
+                },
+                "RunOrder": 2,
+                "Configuration": {
+                  "ActionMode": "CREATE_UPDATE",
+                  "Capabilities": "CAPABILITY_IAM",
+                  "RoleArn": "arn:aws:iam::313694191233:role/test-cfn-pipelin",
+                  "StackName": "persistent-resources",
+                  "TemplatePath": "MyApp::cfn/consul.json"
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "MyApp"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Name": "Test",
+            "Actions": [
+              {
+                "Name": "CodeBuild",
+                "ActionTypeId": {
+                  "Category": "Test",
+                  "Owner": "AWS",
+                  "Provider": "CodeBuild",
+                  "Version": "1"
+                },
+                "RunOrder": 1,
+                "Configuration": {
+                  "ProjectName": {"Ref": "CodebuildProjectName"}
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "MyApp"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
+
+

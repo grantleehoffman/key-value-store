@@ -17,6 +17,7 @@
     "KeyName": {
       "Description": "Name of an existing EC2 key pair to enable SSH access to the instances",
       "Type": "AWS::EC2::KeyPair::KeyName",
+      "Default": "key-value",
       "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
     },
     "NumberOfInstances": {
@@ -146,7 +147,7 @@
           "cp /tmp/consul /opt/consul/consul\n",
           "chmod +x /opt/consul/consul\n",
           "nohup /opt/consul/consul agent -retry-join \"provider=aws tag_key=consul-key-value tag_value=member\"",
-            " -data-dir /opt/consul/data  -server -bootstrap-expect 3",
+            " -data-dir /opt/consul/data  -server -bootstrap-expect 3 -client 0.0.0.0",
             "  >> /var/log/consul.log &\n",
           "/usr/local/bin/cfn-signal -e $? ",
             "         --stack ", {"Ref": "AWS::StackName"},
@@ -203,6 +204,12 @@
             "FromPort": 8600,
             "ToPort": 8600,
             "SourceSecurityGroupId": {"Ref": "ConsulServerSecurityGroup"}
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 8500,
+            "ToPort": 8500,
+            "SourceSecurityGroupId": {"Fn::ImportValue" : "Key-Value-ElbSecurityGroup"}
           },
           {
             "IpProtocol": "tcp",
