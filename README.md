@@ -4,10 +4,11 @@ Key value store service
 ## Prerequisites
 * Hosted Zone
 * SSL Cert
-* key-pair
+* ssh key pair in ec2
 * Pipeline Source bucket
+* Pipeline bucket
 * artifact bucket
 
 ## Build, create pipeline, Deploy infrastructure and test
-cd scripts && ./setup_and_run_deployment_pipeline.sh
+./scripts/setup_and_run_deployment_pipeline.sh
 

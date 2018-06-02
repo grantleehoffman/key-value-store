@@ -18,7 +18,7 @@ func init() {
 	cobra.OnInitialize()
 
 	RootCmd.AddCommand(getKey)
-	RootCmd.PersistentFlags().StringP("ServiceEndpoint", "s", "kvdemo.thehoff.xyz", "(string) key value service host endpoint.")
+	RootCmd.PersistentFlags().StringP("service-endpoint", "s", "kvdemo.thehoff.xyz", "(string) key value service host endpoint.")
 	getKey.Flags().StringP("key", "k", "", "(string) The key to retrieve the value of.")
 	getKey.MarkFlagRequired("key")
 
@@ -37,12 +37,15 @@ var getKey = &cobra.Command{
 	Use:   "get --key <key> ",
 	Short: "Get the value of a stored key.",
 	Run: func(cmd *cobra.Command, args []string) {
+		store := cmd.Flag("service-endpoint").Value.String()
 		key := cmd.Flag("key").Value.String()
-		err := action.GetKey(key)
+		value, err := action.GetKey(store, key)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 			os.Exit(1)
 		}
+		fmt.Println(string(value))
+
 	},
 }
 
@@ -50,10 +53,11 @@ var putKey = &cobra.Command{
 	Use:   "put --key <key> --value <value>",
 	Short: "Create a new stored key/value.",
 	Run: func(cmd *cobra.Command, args []string) {
+		store := cmd.Flag("service-endpoint").Value.String()
 		key := cmd.Flag("key").Value.String()
 		value := cmd.Flag("value").Value.String()
 
-		err := action.PutKey(key, value)
+		err := action.PutKey(store, key, value)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 			os.Exit(1)
@@ -65,9 +69,10 @@ var deleteKey = &cobra.Command{
 	Use:   "delete --key <key>",
 	Short: "Delete a key from the key value store.",
 	Run: func(cmd *cobra.Command, args []string) {
+		store := cmd.Flag("service-endpoint").Value.String()
 		key := cmd.Flag("key").Value.String()
 
-		err := action.DeleteKey(key)
+		err := action.DeleteKey(store, key)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 			os.Exit(1)

@@ -1,5 +1,4 @@
 #!/bin/bash -e
-cd ..
 ./build.sh
 export AWS_DEFAULT_REGION=us-east-1
 aws s3 cp deployment-artifact.zip s3://craft-demo-pipeline-source-bucket-us-east-1/deployment-artifact.zip
