@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -36,11 +37,11 @@ func getValueFromConsulBody(body []byte) (string, error) {
 	var consulResponse []responseJson
 	err := json.Unmarshal(body, &consulResponse)
 	if err != nil {
-		return "", fmt.Errorf(fmt.Sprintf("json unmarshal error %s", err))
+		return "", errors.New(fmt.Sprintf("json unmarshal error %s", err))
 	}
 	value, err := base64.StdEncoding.DecodeString(consulResponse[0].Value)
 	if err != nil {
-		return "", fmt.Errorf(fmt.Sprintf("json unmarshal error %s", err))
+		return "", errors.New(fmt.Sprintf("json unmarshal error %s", err))
 	}
 	return string(value), nil
 }
@@ -51,13 +52,13 @@ func keyValueRequest(method, url, data string) ([]byte, error) {
 		return []byte{}, err
 	}
 	if resp.StatusCode >= 300 {
-		return []byte{}, fmt.Errorf(fmt.Sprintf("response status '%s'", resp.Status))
+		return []byte{}, errors.New(fmt.Sprintf("response status '%s'", resp.Status))
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return []byte{}, fmt.Errorf(fmt.Sprintf("response body %s", err))
+		return []byte{}, errors.New(fmt.Sprintf("response body %s", err))
 	}
 	return body, nil
 }
@@ -81,7 +82,6 @@ func PutKey(store, key, value string) error {
 }
 
 func DeleteKey(store, key string) error {
-	fmt.Println("deleting")
 	url := storeURL(store, key)
 
 	body, err := keyValueRequest(http.MethodDelete, url, key)
