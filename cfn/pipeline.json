@@ -15,7 +15,7 @@
     },
     "SourceArtifactBucket": {
       "Description": "The s3 bucket name for the pipeline source artifact",
-      "Default": "creaft-demo-pipeline-source-bucket-us-east-1",
+      "Default": "craft-demo-pipeline-source-bucket-us-east-1",
       "Type": "String"
     },
     "SourceArtifactKey": {
