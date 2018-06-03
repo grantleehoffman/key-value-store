@@ -21,4 +21,4 @@ get_args
 echo "$KeyName $ArtifactBucket $AllowedIpCidrBlock $ELBHostedZoneName $SSLCertARN"
 
 echo "{\"Parameters\" : {\"KeyName\" : \"${KeyName}\", \"ArtifactBucket\": \"$ArtifactBucket\" } }" > cfn/consul-parameters.json
-echo "{\"Parameters\" : {\"ELBHostedZoneName\" : \"${ELBHostedZoneName}\", \"SSLCertARN\": \"$SSLCertARN\", \"AllowedIpCidrBlock\": \"$AllowedIpCidrBlock\" } }" > cfn/persistent-resources-parameters.json
+echo "{\"Parameters\" : {\"ELBHostedZoneName\" : \"${ELBHostedZoneName}.\", \"SSLCertARN\": \"$SSLCertARN\", \"AllowedIpCidrBlock\": \"$AllowedIpCidrBlock\" } }" > cfn/persistent-resources-parameters.json
