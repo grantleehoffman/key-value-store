@@ -84,3 +84,4 @@ aws cloudformation delete-stack --stack-name kv-pipeline --profile my-profile --
 ## TODO
 * Front Consul cluster with custom API
 * Add Multi-AZ
+* Automate teardown
