@@ -75,19 +75,12 @@ func GetKey(store string, key string) (string, error) {
 func PutKey(store, key, value string) error {
 	url := storeURL(store, key)
 	_, err := keyValueRequest(http.MethodPut, url, value)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func DeleteKey(store, key string) error {
 	url := storeURL(store, key)
 
-	body, err := keyValueRequest(http.MethodDelete, url, key)
-	if err != nil {
-		return err
-	}
-	fmt.Println(string(body))
-	return nil
+	_, err := keyValueRequest(http.MethodDelete, url, key)
+	return err
 }

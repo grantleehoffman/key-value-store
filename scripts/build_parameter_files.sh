@@ -17,7 +17,6 @@ do
 done
 }
 
-
 get_args
 echo "$KeyName $ArtifactBucket $AllowedIpCidrBlock $ELBHostedZoneName $SSLCertARN"
 
