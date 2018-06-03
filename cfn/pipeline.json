@@ -76,7 +76,7 @@
                     "s3:PutObject"
                   ],
                   "Resource": [
-                    "arn:aws:s3:::codepipeline*"
+                    {"Fn::Sub": "arn:aws:s3:::${PipelineBucket}/*"}
                   ],
                   "Effect": "Allow"
                 },
@@ -233,7 +233,7 @@
                     "s3:Get*"
                   ],
                   "Effect": "Allow",
-                  "Resource": {"Fn::Sub": "arn:aws:s3:::${PipelineBucket}/*"}
+                  "Resource": {"Fn::Sub": "arn:aws:s3:::${PipelineBucket}*"}
                 },
                 {
                   "Effect": "Allow",

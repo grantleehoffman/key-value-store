@@ -2,6 +2,8 @@
 Key value store service
 
 ## Prerequisites
+* dep Golang Dependency manager
+* awscli
 * Route53 Hosted Zone
 * SSL Cert ARN
 * EC2 key pair name
