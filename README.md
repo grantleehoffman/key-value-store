@@ -9,7 +9,7 @@ Key value store service
 * EC2 key pair name
 * Pipeline source bucket (versioning enabled)
 * Pipeline action bucket (versioning enabled)
-* Artifact bucket with [consul binary](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip)
+* Artifact bucket with unzipped [consul binary](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip)
 
 ## Build, create pipeline, Deploy infrastructure and test
 Currently must be run in us-east-1 due to ami hardcoded
