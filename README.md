@@ -31,7 +31,7 @@ The `setup_and_run_deployment_pipeline.sh` script will do the following:
 7. The Pipeline will then run the Codebuild job to test the key-value binary interaction with the consul cluster using the `key_value_test.sh` script
 
 
-Example script execution:
+#### Example script execution:
 ```
 ./scripts/setup_and_run_deployment_pipeline.sh -s pipeline-source-bucket -a codepipeline-bucket -p my-profile -r us-east-1 -c
 ```
