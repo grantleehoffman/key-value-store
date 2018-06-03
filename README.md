@@ -2,6 +2,7 @@
 Key value store service
 
 ## Prerequisites
+* go 1.10.x
 * dep Golang dependency manager
 * awscli
 
