@@ -101,6 +101,5 @@ func DeleteKey(store, key string) error {
 		return err
 	}
 	_, err = keyValueRequest(newRequest(req))
-
 	return err
 }
