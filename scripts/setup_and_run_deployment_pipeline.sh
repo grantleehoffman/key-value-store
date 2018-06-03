@@ -45,7 +45,7 @@ aws s3 cp deployment-artifact.zip "s3://${source_bucket}/deployment-artifact.zip
 
 if [[ ${stack_status} != "CREATE_COMPLETE" ]] && [[ ${stack_status} != "UPDATE_COMPLETE" ]];then
   aws cloudformation create-stack --stack-name kv-pipeline --template-body file://cfn/pipeline.json \
-     --capabilities CAPABILITY_IAM --parameters \
+     --capabilities CAPABILITY_IAM --region "${region}" --parameters \
      "[{\"ParameterKey\":\"SourceArtifactBucket\",\"ParameterValue\":\"${source_bucket}\"},\
      {\"ParameterKey\":\"SourceArtifactKey\",\"ParameterValue\":\"deployment-artifact.zip\"},\
      {\"ParameterKey\":\"PipelineBucket\",\"ParameterValue\":\"${pipeline_action_bucket}\"}]"
