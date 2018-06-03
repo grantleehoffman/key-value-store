@@ -12,6 +12,7 @@ Key value store service
 * Artifact bucket with [consul binary](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip)
 
 ## Build, create pipeline, Deploy infrastructure and test
+Currently must be run in us-east-1 due to ami hardcoded
 ```
 ./scripts/setup_and_run_deployment_pipeline.sh -s pipeline-source-bucket -a codepipeline-bucket -p my-profile -r us-east-1 -c
 ```
@@ -25,3 +26,5 @@ aws cloudformation delete-stack --stack-name kv-pipeline
 
 ```
 
+## TODO
+ami id region map in cfn
