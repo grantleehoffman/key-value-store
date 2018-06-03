@@ -41,12 +41,12 @@ The `setup_and_run_deployment_pipeline.sh` script will do the following:
 
 ## CLI
 
-A basic CLI for interacting with the Consul key-value store API.
+A basic CLI for interacting with the Consul key-value store API
 
 #### Build
-```
-build.sh
-```
+
+`build.sh`
+
 
 Mac OSX binary can be located at:
 ```
@@ -63,9 +63,8 @@ Linux binary can be located at:
 
 A basic integration test scipt is located at: `scripts/key_value_test.sh`
 
-* This is the same script the Codebuild test job runs
+This script requires you to have the key-value binary in your current working directory and to set the env `server_url` with your server endpoint URL.  It is the same script the Codebuild test job runs.
 
-This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URL.
 
 * Example: `export server_url="kvdemo.thehoff.xyz"`
 
