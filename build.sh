@@ -4,7 +4,7 @@ mkdir -p build
 
 cd cli
 make
-cp bin/key-value ../build
+cp bin/linux/key-value ../build
 cd ..
 
 cp -f buildspec.yml build
