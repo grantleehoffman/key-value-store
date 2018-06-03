@@ -65,7 +65,7 @@ A basic integration test scipt is located at `scripts/key_value_test.sh`
 
 * This is the same script the Codebuild test job runs.
 
-This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URI.
+This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URL.
 
 * Example: `export server_url="kvdemo.thehoff.xyz"`
 
