@@ -36,12 +36,12 @@ build.sh
 Mac OSX binary can be located at:
 ```
 ./cli/bin/darwin/key-value
-``
+```
 
 Linux binary can be located at:
 ```
 ./cli/bin/linux/key-value
-``
+```
 
 ## TODO
 ami id region map in cfn
