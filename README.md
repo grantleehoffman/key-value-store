@@ -1,4 +1,4 @@
-#Key-Value store demo project
+# Key-Value Store Demo Project
 
 ## Prerequisites
 * go 1.10.x
