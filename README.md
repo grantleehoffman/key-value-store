@@ -14,4 +14,13 @@ Key value store service
 ./scripts/build_parameter_files.sh
 ./scripts/setup_and_run_deployment_pipeline.sh
 ```
+## Teardown
+
+Stacks must be tore down in the following order and each stack should be fully destroyed before destroying the next stack.
+```
+aws cloudformation delete-stack --stack-name consul
+aws cloudformation delete-stack --stack-name persistent-resources
+aws cloudformation delete-stack --stack-name kv-pipeline
+
+```
 
