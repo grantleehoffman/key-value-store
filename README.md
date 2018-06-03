@@ -4,10 +4,10 @@ Key value store service
 ## Prerequisites
 * Route53 Hosted Zone
 * SSL Cert ARN
-* EC2 key pair Name
-* Pipeline Source bucket (versioning enabled)
-* Pipeline bucket (versioning enabled)
-* artifact bucket with consul binary
+* EC2 key pair name
+* Pipeline source bucket (versioning enabled)
+* Pipeline action bucket (versioning enabled)
+* Artifact bucket with [consul binary](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip)
 
 ## Build, create pipeline, Deploy infrastructure and test
 ```
