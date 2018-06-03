@@ -14,7 +14,7 @@ Key value store service
 6. Register Route53 Domain
 7. Create SSL Cert through AWS ACM for the registered domain in the last step
 
-* Resources must all be created in the same region, tested with us-east-1
+* Resources must all be created in the same region, tested with us-east-1 & us-west-2 resources
 
 
 ## Build, create pipeline, deploy infrastructure and test
