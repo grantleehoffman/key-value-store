@@ -140,11 +140,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "autoscaling:Create*",
-                    "autoscaling:Describe*",
-                    "autoscaling:DeleteLaunchConfiguration",
-                    "autoscaling:DeleteAutoScalingGroup",
-                    "autoscaling:UpdateAutoScalingGroup",
+                    "autoscaling:*",
                     "ec2:releaseAddress",
                     "ec2:Authorize*",
                     "ec2:Create*",

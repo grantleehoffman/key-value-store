@@ -20,9 +20,9 @@ Currently must be run in us-east-1 due to ami hardcoded
 
 Stacks must be tore down in the following order and each stack should be fully destroyed before destroying the next stack.
 ```
-aws cloudformation delete-stack --stack-name kv-consul
-aws cloudformation delete-stack --stack-name kv-persistent-resources
-aws cloudformation delete-stack --stack-name kv-pipeline
+aws cloudformation delete-stack --stack-name kv-consul-cluster --profile my-profile --region us-east-1
+aws cloudformation delete-stack --stack-name kv-persistent-resources --profile my-profile --region us-east-1
+aws cloudformation delete-stack --stack-name kv-pipeline --profile my-profile --region us-east-1
 
 ```
 
