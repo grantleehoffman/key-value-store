@@ -1,5 +1,5 @@
 # key-value-store
-Key value store service
+Key value store demo project
 
 ## Prerequisites
 * go 1.10.x
