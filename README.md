@@ -11,14 +11,14 @@ Key value store service
 * Pipeline action bucket (versioning enabled)
 * Artifact bucket with unzipped [consul binary](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip)
 
-## Build, create pipeline, Deploy infrastructure and test
-must be run in us-east-1 due to ami hardcoding
+## Build, create pipeline, deploy infrastructure and test
+must run in us-east-1 due to ami hardcoding
 ```
 ./scripts/setup_and_run_deployment_pipeline.sh -s pipeline-source-bucket -a codepipeline-bucket -p my-profile -r us-east-1 -c
 ```
 ## Teardown
 
-Stacks must be tore down in the following order and each stack should be fully destroyed before destroying the next stack.
+Stacks must be tore down in the following order, each stack should be fully destroyed before deleting the following stack.
 ```
 aws cloudformation delete-stack --stack-name kv-consul-cluster --profile my-profile --region us-east-1
 aws cloudformation delete-stack --stack-name kv-persistent-resources --profile my-profile --region us-east-1
