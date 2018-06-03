@@ -12,7 +12,7 @@
 4. Setup pipeline action bucket, enable versioning
 5. Create EC2 key pair
 6. Register Route53 domain
-7. Create SSL Cert through AWS ACM for the registered domain in the last step
+7. Create SSL cert through AWS ACM for the registered domain in the last step
 
 * Resources must all be created in the same region
   * tested in us-east-1 & us-west-2
@@ -22,8 +22,8 @@
 
 The `setup_and_run_deployment_pipeline.sh` script will do the following:
 
-1. Build the key-value cli
-2. Package the cfn templates and key-value cli into a deploy artifact
+1. Build the key-value CLI
+2. Package the cfn templates and key-value CLI into a deploy artifact
 3. Upload the artifact to the pipeline source S3 bucket
 4. Create a CodePipeline and Codebuild test job using the pipeline cfn template
 5. The Pipeline will then execute and create an infrastructure stack using the persistent-resources cfn template
@@ -41,7 +41,7 @@ The `setup_and_run_deployment_pipeline.sh` script will do the following:
 
 ## CLI
 
-A basic cli for interacting with the consul key-value store api
+A basic CLI for interacting with the consul key-value store API.
 
 #### Build
 ```
@@ -72,7 +72,7 @@ This script requires you have the key-value binary in your current working direc
 
 ## Teardown
 
-Stacks must be torn down in the following order and each stack must be fully destroyed before deleting the following stack, otherwise you may receive resource dependency errors
+Stacks must be torn down in the following order and each stack must be fully destroyed before deleting the following stack, otherwise you may receive resource dependency errors.
 
 ```
 aws cloudformation delete-stack --stack-name kv-consul-cluster --profile my-profile --region us-east-1
