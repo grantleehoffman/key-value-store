@@ -294,7 +294,7 @@
                 },
                 "RunOrder": 1,
                 "Configuration": {
-                  "ActionMode": "CREATE_UPDATE",
+                  "ActionMode": "REPLACE_ON_FAILURE",
                   "Capabilities": "CAPABILITY_IAM",
                   "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
                   "StackName": "kv-persistent-resources",
@@ -317,7 +317,7 @@
                 },
                 "RunOrder": 2,
                 "Configuration": {
-                  "ActionMode": "CREATE_UPDATE",
+                  "ActionMode": "REPLACE_ON_FAILURE",
                   "Capabilities": "CAPABILITY_IAM",
                   "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
                   "StackName": "kv-consul-cluster",
