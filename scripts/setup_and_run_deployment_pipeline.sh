@@ -41,7 +41,6 @@ stack_status=$(aws cloudformation describe-stacks --stack-name kv-pipeline --pro
 set -e
 
 ./build.sh
-export AWS_DEFAULT_REGION=us-east-1
 aws s3 cp deployment-artifact.zip "s3://${source_bucket}/deployment-artifact.zip" --profile "${profile}"
 
 if [[ ${stack_status} != "CREATE_COMPLETE" ]] && [[ ${stack_status} != "UPDATE_COMPLETE" ]];then

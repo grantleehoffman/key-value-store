@@ -302,7 +302,7 @@
                   "ActionMode": "CREATE_UPDATE",
                   "Capabilities": "CAPABILITY_IAM",
                   "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
-                  "StackName": "persistent-resources",
+                  "StackName": "kv-persistent-resources",
                   "TemplatePath": "MyApp::persistent-resources.json",
                   "TemplateConfiguration": "MyApp::persistent-resources-parameters.json"
                 },
@@ -325,7 +325,7 @@
                   "ActionMode": "CREATE_UPDATE",
                   "Capabilities": "CAPABILITY_IAM",
                   "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
-                  "StackName": "consul",
+                  "StackName": "kv-consul-cluster",
                   "TemplatePath": "MyApp::consul.json",
                   "TemplateConfiguration": "MyApp::consul-parameters.json"
                 },
