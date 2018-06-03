@@ -3,11 +3,6 @@
   "Description": "Bastion Instance",
 
   "Parameters": {
-    "AmiId": {
-      "Description": "Ubuntu AMI ID",
-      "Default": "ami-a4dc46db",
-      "Type": "String"
-    },
     "InstanceType": {
       "Description": "Instance Size",
       "Type": "String",
@@ -20,11 +15,20 @@
     }
   },
 
+  "Mappings": {
+    "RegionMap": {
+      "us-east-1": {"64": "ami-a4dc46db"},
+      "us-east-2": {"64": "ami-6a003c0f"},
+      "us-west-1": {"64": "ami-8d948ced"},
+      "us-west-2": {"64": "ami-db710fa3"}
+    }
+  },
+
   "Resources": {
     "Instance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
-        "ImageId": {"Ref": "AmiId"},
+        "ImageId": {"Fn::FindInMap": ["RegionMap", {"Ref": "AWS::Region"}, "64"]},
         "InstanceType": {"Ref": "InstanceType"},
         "KeyName": {"Ref": "KeyName"},
         "NetworkInterfaces": [
@@ -49,7 +53,7 @@
             "CidrIp": "0.0.0.0/0"
           }
         ],
-        "VpcId": {"Fn::ImportValue" :  "Key-Value-VPCID"}
+        "VpcId": {"Fn::ImportValue":  "Key-Value-VPCID"}
       }
     }
   },

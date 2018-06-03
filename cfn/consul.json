@@ -3,11 +3,6 @@
   "Description": "Consul ASG template",
 
   "Parameters": {
-    "AmiId": {
-      "Description": "Ubuntu AMI ID",
-      "Default": "ami-a4dc46db",
-      "Type": "String"
-    },
     "InstanceType": {
       "Description": "Instance size",
       "Type": "String",
@@ -33,6 +28,15 @@
       "Description": "Bucket object key where artifact is retrieved from",
       "Default": "consul",
       "Type": "String"
+    }
+  },
+
+  "Mappings": {
+    "RegionMap": {
+      "us-east-1": {"64": "ami-a4dc46db"},
+      "us-east-2": {"64": "ami-6a003c0f"},
+      "us-west-1": {"64": "ami-8d948ced"},
+      "us-west-2": {"64": "ami-db710fa3"}
     }
   },
 
@@ -126,7 +130,7 @@
     "ConsulLaunchConfig": {
       "Type": "AWS::AutoScaling::LaunchConfiguration",
       "Properties": {
-        "ImageId": { "Ref": "AmiId" },
+        "ImageId": {"Fn::FindInMap": ["RegionMap", {"Ref": "AWS::Region"}, "64"]},
         "InstanceType": {"Ref": "InstanceType"},
         "IamInstanceProfile": {"Ref": "InstanceProfile" },
         "SecurityGroups": [ {"Ref": "ConsulServerSecurityGroup"}, {"Ref": "ConsulServerAccessGroup"}],
@@ -141,8 +145,7 @@
           "pip install awscli\n",
           "mkdir -p /opt/consul\n",
           "aws s3api get-object --bucket ", {"Ref": "ArtifactBucket"},
-            " --key ", {"Ref": "ArtifactKey"},  " /tmp/consul",
-            " --region ", {"Ref": "AWS::Region"}, "\n",
+            " --key ", {"Ref": "ArtifactKey"},  " /tmp/consul\n",
           "cp /tmp/consul /opt/consul/consul\n",
           "chmod +x /opt/consul/consul\n",
           "nohup /opt/consul/consul agent -retry-join \"provider=aws tag_key=consul-key-value tag_value=member\"",
