@@ -18,7 +18,7 @@ done
 
 # Build deployment artifact
 cp -f cli/bin/linux/key-value build
-cp -f scripts/key-value-test.sh build
+cp -f scripts/key_value_test.sh build
 cp -f buildspec.yml build
 cp -Rf cfn build
 zip -r deployment-artifact -j build/*
