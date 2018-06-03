@@ -1,6 +1,7 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Bastion Instance",
+
   "Parameters": {
     "AmiId": {
       "Description": "Ubuntu AMI ID",
@@ -18,6 +19,7 @@
       "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
     }
   },
+
   "Resources": {
     "Instance": {
       "Type": "AWS::EC2::Instance",
@@ -51,6 +53,7 @@
       }
     }
   },
+
   "Outputs": {
     "PublicIP": {
       "Description": "Public IP of the instance",
@@ -62,4 +65,6 @@
       }
     }
   }
+
 }
+

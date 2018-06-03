@@ -1,6 +1,5 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-
   "Description": "Consul ASG template",
 
   "Parameters": {
@@ -230,5 +229,4 @@
   }
 
 }
-
 
