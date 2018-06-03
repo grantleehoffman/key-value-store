@@ -11,6 +11,14 @@ import (
 	"net/url"
 )
 
+type requester interface {
+	request() (*http.Response, error)
+}
+
+type requestClient struct {
+	req *http.Request
+}
+
 type responseJson struct {
 	Value string
 }
@@ -23,14 +31,13 @@ func storeURL(store, key string) string {
 	return u.String()
 }
 
-func request(method, url string, body string) (*http.Response, error) {
-	req, err := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
-	if err != nil {
-		return &http.Response{}, err
-	}
+func newRequest(r *http.Request) requester {
+	return requestClient{r}
+}
 
+func (r requestClient) request() (*http.Response, error) {
 	c := &http.Client{}
-	return c.Do(req)
+	return c.Do(r.req)
 }
 
 func getValueFromConsulBody(body []byte) (string, error) {
@@ -41,13 +48,13 @@ func getValueFromConsulBody(body []byte) (string, error) {
 	}
 	value, err := base64.StdEncoding.DecodeString(consulResponse[0].Value)
 	if err != nil {
-		return "", errors.New(fmt.Sprintf("json unmarshal error %s", err))
+		return "", errors.New(fmt.Sprintf("base64 decode error %s", err))
 	}
 	return string(value), nil
 }
 
-func keyValueRequest(method, url, data string) ([]byte, error) {
-	resp, err := request(method, url, data)
+func keyValueRequest(r requester) ([]byte, error) {
+	resp, err := r.request()
 	if err != nil {
 		return []byte{}, err
 	}
@@ -65,7 +72,11 @@ func keyValueRequest(method, url, data string) ([]byte, error) {
 
 func GetKey(store string, key string) (string, error) {
 	url := storeURL(store, key)
-	body, err := keyValueRequest(http.MethodGet, url, key)
+	req, err := http.NewRequest(http.MethodGet, url, bytes.NewReader([]byte(key)))
+	if err != nil {
+		return "", err
+	}
+	body, err := keyValueRequest(newRequest(req))
 	if err != nil {
 		return "", err
 	}
@@ -74,13 +85,22 @@ func GetKey(store string, key string) (string, error) {
 
 func PutKey(store, key, value string) error {
 	url := storeURL(store, key)
-	_, err := keyValueRequest(http.MethodPut, url, value)
+	req, err := http.NewRequest(http.MethodPut, url, bytes.NewReader([]byte(value)))
+	if err != nil {
+		return err
+	}
+	_, err = keyValueRequest(newRequest(req))
 	return err
 }
 
 func DeleteKey(store, key string) error {
 	url := storeURL(store, key)
 
-	_, err := keyValueRequest(http.MethodDelete, url, key)
+	req, err := http.NewRequest(http.MethodDelete, url, bytes.NewReader([]byte(key)))
+	if err != nil {
+		return err
+	}
+	_, err = keyValueRequest(newRequest(req))
+
 	return err
 }

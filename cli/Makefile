@@ -1,10 +1,13 @@
-all: clean fmt deps vet build
+all: clean fmt deps vet test build
 deps:
 	@dep ensure
 fmt:
 	@go fmt ./...
 vet:
 	@go vet ./...
+
+test:
+	@go test -v ./...
 
 build:
 	@rm -rf vendor
