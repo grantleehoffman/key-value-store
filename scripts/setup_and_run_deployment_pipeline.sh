@@ -6,11 +6,12 @@ usage() {
   echo "  -a pipeline_action_bucket [required]"
   echo "  -p profile [required]"
   echo "  -r region [required]"
-  echo -e "\nExample: $0 -s my-s3-bucket -a my-pipeline-bucket -p my-aws-profile -r us-east-1\n"
+  echo "  -c [optional] - interactively set up your cfn parameter values"
+  echo -e "\nExample: $0 -s my-s3-bucket -a my-pipeline-bucket -p my-aws-profile -r us-east-1 -c\n"
   exit 1
 }
 
-while getopts "s:a:p:r:" OPT
+while getopts "s:a:p:r:c" OPT
 do
   case $OPT in
     "s")
@@ -25,6 +26,9 @@ do
     "r")
       region=${OPTARG}
       ;;
+    "c")
+      cfn_parameters=true
+      ;;
     "h"|*)
       usage
       ;;
@@ -35,6 +39,9 @@ if [[ -z ${source_bucket} || -z ${profile} || -z ${region} || -z ${pipeline_acti
   usage
 fi
 
+if [[ ${cfn_parameters} ]];then
+  scripts/build_parameter_files.sh
+fi
 
 set +e
 stack_status=$(aws cloudformation describe-stacks --stack-name kv-pipeline --profile "${profile}" --region "${region}" --query Stacks[].StackStatus --output text 2> /dev/null)

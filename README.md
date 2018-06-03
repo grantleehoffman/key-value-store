@@ -11,8 +11,7 @@ Key value store service
 
 ## Build, create pipeline, Deploy infrastructure and test
 ```
-./scripts/build_parameter_files.sh
-./scripts/setup_and_run_deployment_pipeline.sh
+./scripts/setup_and_run_deployment_pipeline.sh -s pipeline-source-bucket -a codepipeline-bucket -p my-profile -r us-east-1 -c
 ```
 ## Teardown
 
