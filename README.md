@@ -55,6 +55,17 @@ Linux binary can be located at:
 ./cli/bin/linux/key-value
 ```
 
+#### Integration test script
+
+A basic integration test scipt is located at `scripts/key-value-test.sh`
+
+* This is the same script the Codebuild test job runs.
+
+This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URI.
+
+* Example: `export server_url="kvdemo.thehoff.xyz"`
+
+
 ## TODO
 * Front Consul cluster with custom API
 * Add Multi-AZ
