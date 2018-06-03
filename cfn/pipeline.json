@@ -92,7 +92,8 @@
                   "Action": [
                     "cloudformation:Describe*",
                     "cloudformation:CreateStack",
-                    "cloudformation:UpdateStack"
+                    "cloudformation:UpdateStack",
+                    "cloudformation:DeleteStack"
                   ],
                   "Resource": "*",
                   "Effect": "Allow"
