@@ -238,15 +238,6 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "dynamodb:GetItem",
-                    "dynamodb:PutItem",
-                    "dynamodb:DeleteItem"
-                  ],
-                  "Resource": "arn:aws:dynamodb:*:*:table/icfs-terraform"
-                },
-                {
-                  "Effect": "Allow",
-                  "Action": [
                     "ec2:Create*",
                     "ec2:Describe*",
                     "ec2:RunInstances"
