@@ -1,0 +1,10 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - key-value put --key test --value testvalue
+      - key-value get --key test
+      - key-value delete --key test
+      - key-value get --key test
+
