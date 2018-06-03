@@ -8,7 +8,7 @@ do
    KeyName=("$input")
    read -p "The s3 bucket that contains the 'consul' binary: " input
    ArtifactBucket=("$input")
-   read -p "Cidr block allowed to access key value api: " input
+   read -p "Cidr block allowed to access key value api, use 0.0.0.0/0 if testing from codebuild: " input
    AllowedIpCidrBlock=("$input")
    read -p "Route53 registered domain name: " input
    ELBHostedZoneName=("$input")
