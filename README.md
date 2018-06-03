@@ -10,6 +10,8 @@ Key value store service
 * artifact bucket with consul binary
 
 ## Build, create pipeline, Deploy infrastructure and test
+```
 ./scripts/build_parameter_files.sh
 ./scripts/setup_and_run_deployment_pipeline.sh
+```
 
