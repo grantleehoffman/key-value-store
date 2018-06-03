@@ -24,7 +24,7 @@ Key value store service
 The `setup_and_run_deployment_pipeline.sh` script will do the following:
 
 * Build the key-value cli.
-* Package the cfn templates and CLI into a deploy artifact.
+* Package the cfn templates and key-value cli into a deploy artifact.
 * Upload the artifact to the pipeline source S3 bucket.
 * Create a CodePipeline and Codebuild test job using the pipeline cfn template.
 * The Pipeline will then execute and create an infrastructure stack using the persistent-resources cfn template.
