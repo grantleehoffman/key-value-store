@@ -6,8 +6,8 @@
 * awscli
 
 #### AWS Account Setup Steps
-1. Setup consul artifact bucket
-2. Download [consul zip](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip), extract `consul` binary, and upload to artifact bucket
+1. Setup Consul artifact bucket
+2. Download [Consul zip](https://releases.hashicorp.com/consul/1.1.0/consul_1.1.0_linux_amd64.zip), extract `consul` binary, and upload to artifact bucket
 3. Setup pipeline source bucket, enable versioning
 4. Setup pipeline action bucket, enable versioning
 5. Create EC2 key pair
@@ -27,8 +27,8 @@ The `setup_and_run_deployment_pipeline.sh` script will do the following:
 3. Upload the artifact to the pipeline source S3 bucket
 4. Create a CodePipeline and Codebuild test job using the pipeline cfn template
 5. The Pipeline will then execute and create an infrastructure stack using the persistent-resources cfn template
-6. The Pipeline will then create a consul cluster stack using the consul cfn template
-7. The Pipeline will then run the Codebuild job to test the key-value binary interaction with the consul cluster using the `key_value_test.sh` script
+6. The Pipeline will then create a Consul cluster stack using the consul cfn template
+7. The Pipeline will then run the Codebuild job to test the key-value binary interaction with the Consul cluster using the `key_value_test.sh` script
 
 
 #### Example Script Execution
@@ -41,7 +41,7 @@ The `setup_and_run_deployment_pipeline.sh` script will do the following:
 
 ## CLI
 
-A basic CLI for interacting with the consul key-value store API.
+A basic CLI for interacting with the Consul key-value store API.
 
 #### Build
 ```
@@ -65,7 +65,7 @@ A basic integration test scipt is located at: `scripts/key_value_test.sh`
 
 * This is the same script the Codebuild test job runs
 
-This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URL
+This script requires you have the key-value binary in your current working directory and set the env `server_url` with your server URL.
 
 * Example: `export server_url="kvdemo.thehoff.xyz"`
 
