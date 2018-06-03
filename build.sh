@@ -7,6 +7,6 @@ make
 cp bin/key-value ../build
 cd ..
 
-cp -r cfn build
+cp -Rf cfn build
 
-zip deployment-artifact build/*
+zip -r deployment-artifact -j build/*

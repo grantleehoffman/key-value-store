@@ -3,11 +3,6 @@
   "Description": "Pipeline Template for automated deployment and testing",
 
   "Parameters": {
-    "CodebuildProjectName": {
-      "Description": "What to name the codebuild project",
-      "Default": "KvTest",
-      "Type": "String"
-    },
     "PipelineBucket": {
       "Description": "Location of the bucket codepipeline will use for moving artifacts between actions",
       "Default": "codepipeline-us-east-1-852943352104",
@@ -29,7 +24,7 @@
     "CodeBuildTest": {
       "Type": "AWS::CodeBuild::Project",
       "Properties": {
-        "Name": {"Ref": "CodebuildProjectName"},
+        "Name": "key-value-test",
         "Source": {"Type": "CODEPIPELINE"},
         "Artifacts": {"Type": "CODEPIPELINE"},
         "ServiceRole": {"Ref": "CodeBuildRole"},
@@ -63,7 +58,7 @@
         "Path": "/",
         "Policies": [
           {
-            "PolicyName": {"Fn::Sub": "${CodebuildProjectName}-pipeline-service-role"},
+            "PolicyName": "key-value-test-pipeline-service-role",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
@@ -95,11 +90,94 @@
                 },
                 {
                   "Action": [
+                    "cloudformation:Describe*",
+                    "cloudformation:CreateStack",
+                    "cloudformation:UpdateStack"
+                  ],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                },
+                {
+                  "Action": [
                     "codebuild:BatchGetBuilds",
                     "codebuild:StartBuild"
                   ],
                   "Resource": "*",
                   "Effect": "Allow"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "CloudformationRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "cloudformation.amazonaws.com"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyName": {"Fn::Sub": "key-value-cloudformation-role"},
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "autoscaling:Create*",
+                    "autoscaling:Describe*",
+                    "autoscaling:DeleteLaunchConfiguration",
+                    "autoscaling:DeleteAutoScalingGroup",
+                    "autoscaling:UpdateAutoScalingGroup",
+                    "ec2:releaseAddress",
+                    "ec2:Authorize*",
+                    "ec2:Create*",
+                    "ec2:Describe*",
+                    "ec2:DisassociateRouteTable",
+                    "ec2:AssociateRouteTable",
+                    "ec2:allocateAddress",
+                    "ec2:Delete*",
+                    "ec2:RunInstances",
+                    "ec2:ModifyVpcAttribute",
+                    "ec2:Vpc*",
+                    "elasticloadbalancing:ConfigureHealthCheck",
+                    "elasticloadbalancing:CreateLoadBalancer",
+                    "elasticloadbalancing:SetLoadBalancer*",
+                    "elasticloadbalancing:Describe*",
+                    "elasticloadbalancing:DeleteLoadBalancer",
+                    "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                    "ec2:DetachInternetGateway",
+                    "ec2:AttachInternetGateway",
+                    "iam:PutRolePolicy",
+                    "iam:DeleteRole*",
+                    "iam:DeleteInstanceProfile",
+                    "iam:AddRoleToInstanceProfile",
+                    "iam:RemoveRoleFromInstanceProfile",
+                    "iam:Create*",
+                    "iam:PassRole",
+                    "route53:ChangeResourceRecordSets",
+                    "route53:Create*",
+                    "route53:Describe*",
+                    "route53:GetChange",
+                    "route53:List*"
+                  ],
+                  "Resource": "*"
                 }
               ]
             }
@@ -129,7 +207,7 @@
         "Path": "/",
         "Policies": [
           {
-            "PolicyName": {"Fn::Sub": "${CodebuildProjectName}-codebuild-role"},
+            "PolicyName": "key-value-codebuild-role",
             "PolicyDocument": {
               "Version": "2012-10-17",
               "Statement": [
@@ -184,7 +262,7 @@
     "Pipeline": {
       "Type": "AWS::CodePipeline::Pipeline",
       "Properties": {
-        "Name": {"Ref": "CodebuildProjectName"},
+        "Name": "key-value-pipeline",
         "RoleArn": {"Fn::GetAtt" : ["PipelineServiceRole", "Arn"] },
         "ArtifactStore": {
           "Type": "S3",
@@ -232,9 +310,10 @@
                 "Configuration": {
                   "ActionMode": "CREATE_UPDATE",
                   "Capabilities": "CAPABILITY_IAM",
-                  "RoleArn": "arn:aws:iam::313694191233:role/test-cfn-pipelin",
+                  "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
                   "StackName": "persistent-resources",
-                  "TemplatePath": "MyApp::cfn/persistent-resources.json"
+                  "TemplatePath": "MyApp::persistent-resources.json",
+                  "TemplateConfiguration": "MyApp::persistent-resources-parameters.json"
                 },
                 "InputArtifacts": [
                   {
@@ -254,9 +333,10 @@
                 "Configuration": {
                   "ActionMode": "CREATE_UPDATE",
                   "Capabilities": "CAPABILITY_IAM",
-                  "RoleArn": "arn:aws:iam::313694191233:role/test-cfn-pipelin",
-                  "StackName": "persistent-resources",
-                  "TemplatePath": "MyApp::cfn/consul.json"
+                  "RoleArn": {"Fn::GetAtt" : ["CloudformationRole", "Arn"]},
+                  "StackName": "consul",
+                  "TemplatePath": "MyApp::consul.json",
+                  "TemplateConfiguration": "MyApp::consul-parameters.json"
                 },
                 "InputArtifacts": [
                   {
@@ -279,7 +359,7 @@
                 },
                 "RunOrder": 1,
                 "Configuration": {
-                  "ProjectName": {"Ref": "CodebuildProjectName"}
+                  "ProjectName": "key-value-test"
                 },
                 "InputArtifacts": [
                   {

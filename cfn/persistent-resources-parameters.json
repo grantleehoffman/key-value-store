@@ -1,0 +1,1 @@
+{"Parameters" : {"ELBHostedZoneName" : "thehoff.xyz.", "SSLCertARN": "arn:aws:acm:us-east-1:313694191233:certificate/12da3a1d-76f0-4282-be13-3c501ebf2b9e", "AllowedIpCidrBlock": "0.0.0.0/0" } }
