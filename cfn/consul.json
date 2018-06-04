@@ -16,7 +16,7 @@
     },
     "NumberOfInstances": {
       "Description": "The Number of instances to create",
-      "Default": "3",
+      "Default": "5",
       "Type": "Number"
     },
     "ArtifactBucket": {
@@ -106,7 +106,7 @@
         "MaxSize": {"Ref": "NumberOfInstances"},
         "DesiredCapacity": {"Ref": "NumberOfInstances"},
         "LoadBalancerNames": [{"Fn::ImportValue": "Key-Value-ElbName" } ],
-        "VPCZoneIdentifier": [{"Fn::ImportValue": "Key-Value-PrivateSubnet"}],
+        "VPCZoneIdentifier": [{"Fn::ImportValue": "Key-Value-PrivateSubnet1"},{"Fn::ImportValue": "Key-Value-PrivateSubnet2"}],
         "Tags":[
           {
             "Key": "Name",
