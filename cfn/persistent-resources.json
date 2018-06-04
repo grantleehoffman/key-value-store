@@ -118,7 +118,7 @@
          "InternetGatewayId": { "Ref": "InternetGateway" }
        }
     },
-    "EIP": {
+    "EIP1": {
       "Type": "AWS::EC2::EIP",
       "Properties": {
         "Domain": "vpc"
@@ -133,7 +133,7 @@
     "NatGateway1": {
       "Type": "AWS::EC2::NatGateway",
       "Properties": {
-        "AllocationId": {"Fn::GetAtt": ["EIP", "AllocationId"]},
+        "AllocationId": {"Fn::GetAtt": ["EIP1", "AllocationId"]},
         "SubnetId": {"Ref": "PublicSubnet1"}
       }
     },
@@ -327,9 +327,13 @@
         "Name": "Key-Value-PrivateSubnet2"
       }
     },
-    "EIP": {
-      "Value": {"Fn::GetAtt": ["EIP", "AllocationId"]},
-      "Description": "The EIP used for the nat gateway"
+    "EIP1": {
+      "Value": {"Fn::GetAtt": ["EIP1", "AllocationId"]},
+      "Description": "The EIP used for the first nat gateway"
+    },
+    "EIP2": {
+      "Value": {"Fn::GetAtt": ["EIP2", "AllocationId"]},
+      "Description": "The EIP used for the second nat gateway"
     },
     "ElbUrl": {
       "Value": { "Fn::Sub": "https://${ElasticLoadBalancer.DNSName}"},
